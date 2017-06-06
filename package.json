@@ -1,0 +1,37 @@
+{
+  "name": "v2ex-node",
+  "version": "0.0.1",
+  "description": "v2ex api in node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --watch --timeout 10000 --reporter spec --compilers ts:ts-node/register test/**/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/green0511/v2ex-node.git"
+  },
+  "keywords": [
+    "v2ex",
+    "api",
+    "node",
+    "typescript"
+  ],
+  "author": "kmsbbb@163.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/green0511/v2ex-node/issues"
+  },
+  "homepage": "https://github.com/green0511/v2ex-node#readme",
+  "dependencies": {
+    "axios": "^0.16.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.0.0",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.27",
+    "chai": "^4.0.2",
+    "mocha": "^3.4.2",
+    "ts-node": "^3.0.4",
+    "typescript": "^2.3.4"
+  }
+}
