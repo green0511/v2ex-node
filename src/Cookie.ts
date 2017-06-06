@@ -2,16 +2,19 @@ export class Cookie {
   private data: any = {}
 
   set(name, value) {
-    console.log('cookie.set')
-    console.log(name)
-    console.log(value)
-    this.data[name] = value
-    console.log(this.data)
-    console.log('cookie.set end')
+    this.data[name] = value || ''
   }
 
   get() {
     return this.data
+  }
+
+  clear() {
+    this.data = {}
+  }
+
+  stringify() {
+    return Object.keys(this.data).map(key => `${key}=${this.data[key]}`).join('; ')
   }
 }
 

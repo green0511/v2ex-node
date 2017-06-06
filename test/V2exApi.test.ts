@@ -1,5 +1,5 @@
 import { V2exApi } from '../src/V2exApi'
-
+import axios from 'axios'
 import { expect } from 'chai'
 
 describe('基础测试', () => {
@@ -161,12 +161,37 @@ describe('基础测试', () => {
   it('测试登陆', done => {
     v2exApi.sigin('green0511', 'kaimansb0307')
       .then(res => {
-        // console.log(res)
+        expect(res.status).equals(200)
         done()
       })
       .catch(err => {
-        // console.log(err)
+        console.log(err)
         done()
       })
   }) 
+
+  // it('测试发表 timeline', done => {
+  //   v2exApi.postTimeline('test from api')
+  //     .then(res => {
+  //       console.log(res)
+  //       done()
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //     })
+  // })
+  it('测试获取 timeline', done => {
+    v2exApi.getStatus().then(res => {
+      console.log('==== res ====')
+      console.log(res.data)
+      console.log(res.headers)
+      console.log(res.config.headers)
+      done()
+    })
+    .catch(err => {
+      console.log('==== err ====')
+      console.dir(err)
+      done()
+    })
+  })
 })

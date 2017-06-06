@@ -2,27 +2,28 @@ import axios, { AxiosPromise } from 'axios'
 import { cookie } from './Cookie'
 import { V2exApiUrl } from './V2exApiUrl'
 
+axios.defaults.headers.common['origin'] = 'https://www.v2ex.com'
+axios.defaults.headers.common['host'] = 'www.v2ex.com'
+axios.defaults.headers.common['referer'] = 'https://www.v2ex.com/t'
+axios.defaults.headers.common['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36'
+// axios.defaults.headers.common['content-type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+
 axios.interceptors.response.use(res => {
+  console.log('============')
+  console.log(res.config.headers)
+  console.log(res.headers)
   let cookieToSet = res && res.headers && res.headers['set-cookie']
   if (cookieToSet) {
-    console.log('====set cookie====')
     //  形如：[ 'PB3_SESSION="2|1:0|10:1496740512|11:PB3_SESSION|36:djJleDoxMTMuMTExLjAuMjg6NzI0Mjc1MDY=|89539309a66a947084379a96b1f5bb7dba66bc59ead39688b563417a37a9b290"; expires=Sun, 11 Jun 2017 09:15:12 GMT; httponly; Path=/', 'V2EX_LANG=zhcn; Path=/' ]
-    let arr = cookieToSet.map(cook => cook.split('; '))
-    arr.map(item => {
+    cookieToSet.map(cook => cook.split('; ')).forEach(item => {
       item.forEach(str => {
-        let cook = str.split('=')
-        cookie.set(cook[0], cook[1])
+        let firstEqual = str.indexOf('=')
+        let key = str.slice(0, firstEqual)
+        let value = str.slice(firstEqual++)
+        cookie.set(key, value)
       })
     })
-    console.log(cookie.get())
-    console.log('====set cookie end ====')
-    // console.log(arr)
-    // arr.forEach(item => item.forEach(cook => {
-    //   // console.log(cook)
-    //   cookie.set(cook[0], cook[1])
-    // }))
-    // console.log(cookie.get())
-    // cookie.set()
   }
   return res
 })
@@ -33,6 +34,10 @@ export class V2exApi {
   
   private getUrl(apiName: string): string {
     return this.url.get(apiName)
+  }
+
+  private formatData(data: any) {
+    return Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
   }
   
   // 获取最热主题
@@ -106,18 +111,43 @@ export class V2exApi {
   }
 
   sigin(username, password) {
-    return axios.post('https://www.v2ex.com/signin', {
+    return axios.post('https://www.v2ex.com/signin', this.formatData({
       '513655847a0b43c47f8d9207e22d7792488280abb728e5f3d4bd41eace1f950b' : username,
       'eba724863603c6fb67b8401b643c0e36a8a971b829d8bf6ff54e9d1f4650eef0' : password,
       once : '83801',
       next : '/'
-    }, {
+    }), {
       headers: {
-        'Origin': 'https://www.v2ex.com',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
-        'Host': 'www.v2ex.com'
+        cookie: cookie.stringify()
       }
     })
+  }
+
+  postTimeline(text, in_reply_to_status_id: number = 0) {
+    return axios.post(this.getUrl('timeline'), {
+      status: text,
+      in_reply_to_status_id: 0,
+      once: 49183
+    }, {
+      headers: {
+        referer: 'https://www.v2ex.com/t',
+        'x-requested-with': 'XMLHttpRequest',
+        // cookie: cookie.stringify(),
+        cookie: cookie.stringify()
+      }
+    })
+  }
+
+  getStatus(afterId: number = 0) {
+    return axios.post(this.getUrl('status'), this.formatData({
+      max_id: afterId
+    }), {
+      headers: {
+        cookie: cookie.stringify()
+      }
+    })
+  }
+
+  getOnce() {
   }
 }
